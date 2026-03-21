@@ -1,9 +1,39 @@
 using System;
+using System.Threading.Tasks;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        Console.WriteLine("Hello World! This is the ScriptureMemorizer Project.");
+        // Exceeding requirement: pull a random scripture from Wikiquote each run.
+        WikiBibleService wikiBibleService = new();
+        Scripture scripture = await wikiBibleService.GetRandomScriptureAsync();
+
+        if (scripture == null)
+        {
+            Console.WriteLine("Couldn't find a scripture. Check your internet connection.");
+            return;
+        }
+
+        while (!scripture.IsCompletelyHidden())
+        {
+            Console.Clear();
+            Console.WriteLine(scripture.GetDisplayText());
+            Console.WriteLine();
+            Console.Write("Press Enter to continue or type 'quit' to finish: ");
+
+            string input = Console.ReadLine() ?? "";
+            if (input.Trim().ToLower() == "quit")
+            {
+                return;
+            }
+
+            scripture.HideRandomWords(3);
+        }
+
+        Console.Clear();
+        Console.WriteLine(scripture.GetDisplayText());
+        Console.WriteLine();
+        Console.WriteLine("All words are now hidden. Great work!");
     }
 }
